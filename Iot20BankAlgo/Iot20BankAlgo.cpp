@@ -54,6 +54,28 @@ private:
 	std::vector<Account *> accounts;
 };
 
+
+
+class VectorAccountNoPtrStorage : public IAccountStorage
+{
+public:
+	void AddAccount(std::string id) override
+	{
+		Account account = Account(id);
+		accounts.push_back(account);
+	}
+	Account* GetAccount(std::string id) override
+	{
+		for (int i = 0; i < accounts.size(); i++)
+			if (accounts[i].GetId() == id) return &accounts[i];
+		return nullptr;
+	}
+private:
+	std::vector<Account> accounts;
+};
+
+
+
 class Bank
 {
 public:
@@ -91,24 +113,37 @@ int main()
 	 */
 
 
+	/*
+	 * Reflektion: SVÅRT  ? Ja!
+	 * Vad ska ni kunna ? Förstå skillnader JA
+	 *						Skriva egen kod typ som nedan: NEJ
+	 * Jag förenklar snart livet för er: - alltid vector, alltid objekt (inte new)						
+	 */
+	
+
 	//
 	high_resolution_clock::time_point start;
 	high_resolution_clock::time_point slut;
-	VectorAccountStorage* storage = new VectorAccountStorage();
 
+	//VectorAccountStorage* storage = new VectorAccountStorage();
+	VectorAccountNoPtrStorage* storage = new VectorAccountNoPtrStorage();
 	Bank* bank = new Bank(storage);
 
-	int antal = 500000;
+	int antal = 1500000;
 
 	start = high_resolution_clock::now();
 	for(int i = 0; i < antal;i++)
 	{
+		//Add some noice to the heap
+		string* s = new string(to_string(i) + to_string(i) + to_string(i) + to_string(i) + to_string(i));
 		bank->AddAccount(std::to_string(i));
+		s = new string(to_string(i) + to_string(i) + to_string(i) + to_string(i) + to_string(i));
 	}
 
 	slut = high_resolution_clock::now();
 	auto duration = duration_cast<milliseconds>(slut - start).count();
 	std::cout << "Insert tog " << duration << " milliseconds\n";
+
 
 	while(1)
 	{
@@ -126,6 +161,7 @@ int main()
 		}
 		else
 			printf("Konton finns");
+
 		auto duration = duration_cast<milliseconds>(slut - start).count();
 		std::cout << "Sök tog " << duration << " milliseconds\n";
 
