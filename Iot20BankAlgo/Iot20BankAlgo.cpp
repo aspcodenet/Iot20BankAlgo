@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <chrono>
+#include <map>
 
 using namespace std;
 using namespace std::chrono;
@@ -10,6 +11,7 @@ using namespace std::chrono;
 class Account
 {
 public:
+	Account() {  }
 	Account(std::string id, float balance = 0)
 	{
 		this->id = id;
@@ -75,6 +77,29 @@ private:
 };
 
 
+class VectorAccountMapStorage : public IAccountStorage
+{
+public:
+	void AddAccount(std::string id) override
+	{
+		Account account = Account(id);
+		accounts[id] = account;
+	}
+	Account* GetAccount(std::string id) override
+	{
+		Account a = accounts[id];
+		if (a.GetId() == id)
+			return &a;
+		return nullptr;
+	}
+private:
+	map<string, Account> accounts;
+};
+
+
+
+
+
 
 class Bank
 {
@@ -98,8 +123,30 @@ private:
 };
 
 
+void MapDemo()
+{
+//	map<string, Account> accounts;
+
+
+	
+	map<int,string> jerseys;
+	jerseys[13] = "Mats Sundin";
+	
+	map<string, int> accounts;
+	accounts["1343"] = 122;
+	accounts["1223"] = 100;
+	accounts["1223"] = accounts["1223"] + 100;
+
+	string cont;
+	cin >> cont;
+}
+
+
 int main()
 {
+	//MapDemo();
+
+	
 	//SJUSOVARE?? :) Ta main.cpp från studentportalen i "Uppgift bankalgoritmer" (Introduktion)
 	//och skapa ett C++ projekt och bara pasta in. Precis detta jag gjort här.
 	//så börjar vi på samma nivå
@@ -127,17 +174,16 @@ int main()
 
 	//VectorAccountStorage* storage = new VectorAccountStorage();
 	VectorAccountNoPtrStorage* storage = new VectorAccountNoPtrStorage();
+	//VectorAccountMapStorage* storage = new VectorAccountMapStorage();
 	Bank* bank = new Bank(storage);
 
-	int antal = 1500000;
+	int antal = 500000;
 
 	start = high_resolution_clock::now();
 	for(int i = 0; i < antal;i++)
 	{
 		//Add some noice to the heap
-		string* s = new string(to_string(i) + to_string(i) + to_string(i) + to_string(i) + to_string(i));
 		bank->AddAccount(std::to_string(i));
-		s = new string(to_string(i) + to_string(i) + to_string(i) + to_string(i) + to_string(i));
 	}
 
 	slut = high_resolution_clock::now();
